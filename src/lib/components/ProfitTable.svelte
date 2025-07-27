@@ -16,9 +16,10 @@
 	interface Props {
 		items: ProfitItem[];
 		highlightTime: number;
+		hideOldData: boolean;
 	}
 
-	let { items, highlightTime }: Props = $props();
+	let { items, highlightTime, hideOldData }: Props = $props();
 
 	type SortField = 'name' | 'cityPrice' | 'blackMarketPrice' | 'profit';
 	type SortDirection = 'asc' | 'desc' | 'none';
@@ -120,15 +121,19 @@
 		return sortDirection === 'asc' ? ChevronUp : ChevronDown;
 	}
 
-	function getTimeBadgeClass(timestamp: number): string {
+	function isTimeInRange(timestamp: number): boolean {
 		const now = Date.now();
 		const diffMs = now - timestamp;
 		const diffHours = diffMs / (1000 * 60 * 60);
 
-		if (diffHours > highlightTime) {
-			return 'bg-red-500/50 border-red-300/50';
-		} else {
+		return diffHours <= highlightTime;
+	}
+
+	function getTimeBadgeClass(timestamp: number): string {
+		if (isTimeInRange(timestamp)) {
 			return 'bg-green-500/50 border-green-300/50';
+		} else {
+			return 'bg-red-500/50 border-red-300/50';
 		}
 	}
 </script>
@@ -194,65 +199,67 @@
 		</TableHeader>
 		<TableBody>
 			{#each sortedItems as item}
-				<TableRow
-					class="cursor-pointer transition-colors hover:bg-muted/50"
-					onclick={() => copyItemName(item)}
-					title="Click to copy item name"
-				>
-					<TableCell>
-						<div
-							class="flex h-12 w-12 items-center justify-center overflow-hidden rounded bg-muted"
-						>
-							<img
-								loading="lazy"
-								src={getItemImageUrl(item)}
-								alt={item.name}
-								class="h-full w-full object-cover"
-							/>
+				{#if (isTimeInRange(item.cityPriceDate) && isTimeInRange(item.blackMarketPriceDate) && hideOldData) || !hideOldData}
+					<TableRow
+						class="cursor-pointer transition-colors hover:bg-muted/50"
+						onclick={() => copyItemName(item)}
+						title="Click to copy item name"
+					>
+						<TableCell>
 							<div
-								class="flex hidden h-full w-full items-center justify-center rounded bg-muted font-mono text-xs"
+								class="flex h-12 w-12 items-center justify-center overflow-hidden rounded bg-muted"
 							>
-								{item.tier}{item.enchant !== '0' ? `.${item.enchant}` : ''}
+								<img
+									loading="lazy"
+									src={getItemImageUrl(item)}
+									alt={item.name}
+									class="h-full w-full object-cover"
+								/>
+								<div
+									class="flex hidden h-full w-full items-center justify-center rounded bg-muted font-mono text-xs"
+								>
+									{item.tier}{item.enchant !== '0' ? `.${item.enchant}` : ''}
+								</div>
 							</div>
-						</div>
-					</TableCell>
-					<TableCell>
-						<div class="space-y-1">
-							<div class="font-medium">{item.name.split(',')[0]}</div>
-							<Badge variant="secondary" class="text-xs">
-								{item.quality}
+						</TableCell>
+						<TableCell>
+							<div class="space-y-1">
+								<div class="font-medium">{item.name.split(',')[0]}</div>
+								<Badge variant="secondary" class="text-xs">
+									{item.quality}
+								</Badge>
+							</div>
+						</TableCell>
+						<TableCell class="text-right font-mono">
+							<div class="flex items-start justify-end gap-1">
+								<span>{humanReadableValue(item.cityPrice)}</span>
+								<Badge
+									variant="outline"
+									class="h-4 px-1 py-0 text-xs {getTimeBadgeClass(item.cityPriceDate)}"
+								>
+									{formatTimeAgo(item.cityPriceDate)}
+								</Badge>
+							</div>
+						</TableCell>
+						<TableCell class="text-right font-mono">
+							<div class="flex items-start justify-end gap-1">
+								<span>{humanReadableValue(item.blackMarketPrice)}</span>
+								<Badge
+									variant="outline"
+									class="h-4 px-1 py-0 text-xs {getTimeBadgeClass(item.blackMarketPriceDate)}"
+								>
+									{formatTimeAgo(item.blackMarketPriceDate)}
+								</Badge>
+							</div>
+						</TableCell>
+						<TableCell class="text-right">
+							<Badge variant={item.profit > 10000 ? 'default' : 'secondary'} class="font-mono">
+								<TrendingUp class="mr-1 h-3 w-3" />
+								{humanReadableValue(item.profit)}
 							</Badge>
-						</div>
-					</TableCell>
-					<TableCell class="text-right font-mono">
-						<div class="flex items-start justify-end gap-1">
-							<span>{humanReadableValue(item.cityPrice)}</span>
-							<Badge
-								variant="outline"
-								class="h-4 px-1 py-0 text-xs {getTimeBadgeClass(item.cityPriceDate)}"
-							>
-								{formatTimeAgo(item.cityPriceDate)}
-							</Badge>
-						</div>
-					</TableCell>
-					<TableCell class="text-right font-mono">
-						<div class="flex items-start justify-end gap-1">
-							<span>{humanReadableValue(item.blackMarketPrice)}</span>
-							<Badge
-								variant="outline"
-								class="h-4 px-1 py-0 text-xs {getTimeBadgeClass(item.blackMarketPriceDate)}"
-							>
-								{formatTimeAgo(item.blackMarketPriceDate)}
-							</Badge>
-						</div>
-					</TableCell>
-					<TableCell class="text-right">
-						<Badge variant={item.profit > 10000 ? 'default' : 'secondary'} class="font-mono">
-							<TrendingUp class="mr-1 h-3 w-3" />
-							{humanReadableValue(item.profit)}
-						</Badge>
-					</TableCell>
-				</TableRow>
+						</TableCell>
+					</TableRow>
+				{/if}
 			{/each}
 		</TableBody>
 	</Table>

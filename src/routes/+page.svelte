@@ -12,7 +12,8 @@
 	let selectedCity = $state(CITY_LIST[0] as string);
 	let selectedFile: string = $state(ITEM_CATEGORIES[0].value);
 	let selectedServer: string = $state(SERVER_LIST[0].value);
-	let highlightTime: number = $state(8);
+	let highlightTime: number = $state(24);
+	let hideOldData: boolean = $state(false);
 	let profitList: ProfitItem[] = $state([]);
 	let isLoading = $state(false);
 	let error = $state('');
@@ -52,6 +53,10 @@
 	function handleHighlightTimeChange(time: number) {
 		highlightTime = time;
 	}
+
+	function handleHideOldDataChange(hide: boolean) {
+		hideOldData = hide;
+	}
 </script>
 
 <div class="container mx-auto space-y-6 p-6">
@@ -68,12 +73,14 @@
 				bind:selectedFile
 				bind:selectedServer
 				bind:highlightTime
+				bind:hideOldData
 				{isLoading}
 				onSearch={searchProfits}
 				onCityChange={handleCityChange}
 				onFileChange={handleFileChange}
 				onServerChange={handleServerChange}
 				onHighlightTimeChange={handleHighlightTimeChange}
+				onHideOldDataChange={handleHideOldDataChange}
 			/>
 
 			<ErrorDisplay {error} />
@@ -100,7 +107,7 @@
 				<CardTitle>Profit Opportunities ({profitList.length} items)</CardTitle>
 			</CardHeader>
 			<CardContent>
-				<ProfitTable items={profitList} {highlightTime} />
+				<ProfitTable items={profitList} {highlightTime} {hideOldData} />
 			</CardContent>
 		</Card>
 	{/if}
