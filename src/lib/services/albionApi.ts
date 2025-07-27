@@ -13,7 +13,7 @@ export class AlbionApiService {
 		}
 
 		// Split items into chunks of 100
-		const chunks = this.chunkArray(itemList, 100);
+		const chunks = this.chunkArray(itemList, 20);
 
 		// Fetch all chunks in parallel
 		const allCityData: MarketDataEntry[] = [];
@@ -58,13 +58,13 @@ export class AlbionApiService {
 		cityData: MarketDataEntry[],
 		blackMarketData: MarketDataEntry[]
 	): ProfitItem[] {
-		const offerDict: Record<string, [number, number]> = {};
+		const offerDict: Record<string, [number, number, string?, string?]> = {};
 
 		// Process city data
 		for (const entry of cityData) {
 			const itemKey = `${entry.item_id}#${entry.quality}`;
 			if (entry.sell_price_min) {
-				offerDict[itemKey] = [entry.sell_price_min, 0];
+				offerDict[itemKey] = [entry.sell_price_min, 0, entry.sell_price_min_date, undefined];
 			}
 		}
 
@@ -76,13 +76,22 @@ export class AlbionApiService {
 
 			if (cityValues.length > 0 && entry.buy_price_max) {
 				const minCityValue = Math.min(...cityValues);
-				offerDict[itemsToPurchase[0]] = [minCityValue, entry.buy_price_max];
+				// Find the corresponding city entry for the date
+				const cityEntryKey = itemsToPurchase.find(key => offerDict[key]?.[0] === minCityValue);
+				const existingCityDate = cityEntryKey ? offerDict[cityEntryKey]?.[2] : undefined;
+				
+				offerDict[itemsToPurchase[0]] = [
+					minCityValue, 
+					entry.buy_price_max, 
+					existingCityDate, 
+					entry.buy_price_max_date
+				];
 			}
 		}
 
 		// Calculate profits
 		const results: ProfitItem[] = [];
-		for (const [itemKey, [cityPrice, blackMarketPrice]] of Object.entries(offerDict)) {
+		for (const [itemKey, [cityPrice, blackMarketPrice, cityPriceDate, blackMarketPriceDate]] of Object.entries(offerDict)) {
 			if (blackMarketPrice > 0) {
 				const profit = Math.round(blackMarketPrice * (1 - TAX) - cityPrice);
 				if (profit > 0) {
@@ -91,7 +100,9 @@ export class AlbionApiService {
 						id: itemKey,
 						name: `${tier}.${enchant} ${name}, ${quality}`,
 						cityPrice,
+						cityPriceDate: new Date(cityPriceDate||'').getTime(),
 						blackMarketPrice,
+						blackMarketPriceDate: new Date(blackMarketPriceDate||'').getTime(),
 						profit,
 						tier,
 						enchant,

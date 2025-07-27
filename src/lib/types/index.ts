@@ -4,7 +4,9 @@ export interface ProfitItem {
 	id: string;
 	name: string;
 	cityPrice: number;
+	cityPriceDate:number;
 	blackMarketPrice: number;
+	blackMarketPriceDate:number;
 	profit: number;
 	tier: string;
 	enchant: string;
@@ -15,7 +17,9 @@ export interface MarketDataEntry {
 	item_id: string;
 	quality: number;
 	sell_price_min?: number;
+	sell_price_min_date?: string;
 	buy_price_max?: number;
+	buy_price_max_date?: string;
 }
 
 export type ItemCategory = keyof typeof ALL_ITEMS_DATA;

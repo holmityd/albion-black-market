@@ -9,7 +9,7 @@
 		TableRow
 	} from '$lib/components/ui/table';
 	import { TrendingUp, ChevronUp, ChevronDown } from 'lucide-svelte';
-	import { humanReadableValue } from '$lib/utils/formatters';
+	import { formatTimeAgo, humanReadableValue } from '$lib/utils/formatters';
 	import type { ProfitItem, Quality } from '$lib/types';
 	import { QUALITY_LIST } from '$lib/constants';
 
@@ -118,6 +118,18 @@
 		}
 		return sortDirection === 'asc' ? ChevronUp : ChevronDown;
 	}
+
+	function getTimeBadgeClass(timestamp: number): string {
+		const now = Date.now();
+		const diffMs = now - timestamp;
+		const diffHours = diffMs / (1000 * 60 * 60);
+
+		if (diffHours > 8) {
+			return 'bg-red-500/50  border-red-300/50';
+		} else {
+			return 'bg-green-500/50 border-green-300/50';
+		}
+	}
 </script>
 
 <div class="rounded-md border">
@@ -212,10 +224,26 @@
 						</div>
 					</TableCell>
 					<TableCell class="text-right font-mono">
-						{humanReadableValue(item.cityPrice)}
+						<div class="flex items-start justify-end gap-1">
+							<span>{humanReadableValue(item.cityPrice)}</span>
+							<Badge
+								variant="outline"
+								class="h-4 px-1 py-0 text-xs {getTimeBadgeClass(item.cityPriceDate)}"
+							>
+								{formatTimeAgo(item.cityPriceDate)}
+							</Badge>
+						</div>
 					</TableCell>
 					<TableCell class="text-right font-mono">
-						{humanReadableValue(item.blackMarketPrice)}
+						<div class="flex items-start justify-end gap-1">
+							<span>{humanReadableValue(item.blackMarketPrice)}</span>
+							<Badge
+								variant="outline"
+								class="h-4 px-1 py-0 text-xs {getTimeBadgeClass(item.blackMarketPriceDate)}"
+							>
+								{formatTimeAgo(item.blackMarketPriceDate)}
+							</Badge>
+						</div>
 					</TableCell>
 					<TableCell class="text-right">
 						<Badge variant={item.profit > 10000 ? 'default' : 'secondary'} class="font-mono">
