@@ -5,7 +5,6 @@ import BASE_ITEM_NAMES from './base_item_names.json';
 
 // App constants
 export const CLIENT_VERSION = '0.4';
-export const DATA_ROUTE = 'https://www.albion-online-data.com/api/v2/stats/prices/';
 export const TAX = 0.06;
 
 export const CITY_LIST = [
@@ -32,4 +31,8 @@ export const ITEM_CATEGORIES: { value: ItemCategory; label: string }[] = [
 	{ value: 'ranged', label: 'Ranged' }
 ];
 
-// Utility functions
+export const SERVER_LIST = [
+	{ value: 'https://europe.albion-online-data.com', label: 'Europe' },
+	{ value: 'https://west.albion-online-data.com', label: 'America' },
+	{ value: 'https://east.albion-online-data.com', label: 'Asia' },
+] as const;

@@ -1,4 +1,4 @@
-import { ALL_ITEMS_DATA, BASE_ITEM_NAMES, DATA_ROUTE, QUALITY_LIST, TAX } from '$lib/constants';
+import { ALL_ITEMS_DATA, BASE_ITEM_NAMES, QUALITY_LIST, TAX } from '$lib/constants';
 import type { ProfitItem, MarketDataEntry, ItemCategory } from '$lib/types';
 
 function getItemsByCategory(category: ItemCategory): string[] {
@@ -6,13 +6,13 @@ function getItemsByCategory(category: ItemCategory): string[] {
 }
 
 export class AlbionApiService {
-	static async fetchMarketData(city: string, category: string): Promise<ProfitItem[]> {
+	static async fetchMarketData(city: string, category: string, serverUrl: string): Promise<ProfitItem[]> {
 		const itemList = getItemsByCategory(category as ItemCategory);
 		if (itemList.length === 0) {
 			throw new Error('No items found for selected category');
 		}
 
-		// Split items into chunks
+		// Split items into chunks of 50
 		const chunks = this.chunkArray(itemList, 50);
 
 		// Fetch all chunks in parallel
@@ -24,8 +24,8 @@ export class AlbionApiService {
 
 			// Fetch city and black market prices for this chunk
 			const [cityData, blackMarketData] = await Promise.all([
-				this.fetchPrices(itemQuery, city),
-				this.fetchPrices(itemQuery, 'blackmarket')
+				this.fetchPrices(itemQuery, city, serverUrl),
+				this.fetchPrices(itemQuery, 'blackmarket', serverUrl)
 			]);
 
 			allCityData.push(...cityData);
@@ -45,11 +45,13 @@ export class AlbionApiService {
 
 	private static async fetchPrices(
 		itemQuery: string,
-		location: string
+		location: string,
+		serverUrl: string
 	): Promise<MarketDataEntry[]> {
-		const response = await fetch(`${DATA_ROUTE}${itemQuery}?locations=${location}`);
+		const apiUrl = `${serverUrl}/api/v2/stats/prices/${itemQuery}?locations=${location}`;
+		const response = await fetch(apiUrl);
 		if (!response.ok) {
-			throw new Error(`Failed to fetch ${location} prices`);
+			throw new Error(`Failed to fetch ${location} prices from ${serverUrl}`);
 		}
 		return response.json();
 	}

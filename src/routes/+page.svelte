@@ -6,24 +6,29 @@
 	import SearchForm from '$lib/components/SearchForm.svelte';
 	import ProfitTable from '$lib/components/ProfitTable.svelte';
 	import ErrorDisplay from '$lib/components/ErrorDisplay.svelte';
-	import { CITY_LIST, CLIENT_VERSION, ITEM_CATEGORIES } from '$lib/constants';
+	import { CITY_LIST, CLIENT_VERSION, ITEM_CATEGORIES, SERVER_LIST } from '$lib/constants';
 
 	// State variables
 	let selectedCity = $state(CITY_LIST[0] as string);
 	let selectedFile: string = $state(ITEM_CATEGORIES[0].value);
+	let selectedServer: string = $state(SERVER_LIST[0].value);
 	let profitList: ProfitItem[] = $state([]);
 	let isLoading = $state(false);
 	let error = $state('');
 
 	async function searchProfits() {
-		if (!selectedCity || !selectedFile) return;
+		if (!selectedCity || !selectedFile || !selectedServer) return;
 
 		isLoading = true;
 		error = '';
 		profitList = [];
 
 		try {
-			profitList = await AlbionApiService.fetchMarketData(selectedCity, selectedFile);
+			profitList = await AlbionApiService.fetchMarketData(
+				selectedCity,
+				selectedFile,
+				selectedServer
+			);
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'An error occurred';
 		} finally {
@@ -37,6 +42,10 @@
 
 	function handleFileChange(file: string) {
 		selectedFile = file;
+	}
+
+	function handleServerChange(server: string) {
+		selectedServer = server;
 	}
 </script>
 
@@ -52,10 +61,12 @@
 			<SearchForm
 				bind:selectedCity
 				bind:selectedFile
+				bind:selectedServer
 				{isLoading}
 				onSearch={searchProfits}
 				onCityChange={handleCityChange}
 				onFileChange={handleFileChange}
+				onServerChange={handleServerChange}
 			/>
 
 			<ErrorDisplay {error} />
