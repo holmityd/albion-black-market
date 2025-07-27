@@ -44,7 +44,12 @@
 						<div
 							class="flex h-12 w-12 items-center justify-center overflow-hidden rounded bg-muted"
 						>
-							<img src={getItemImageUrl(item)} alt={item.name} class="h-full w-full object-cover" />
+							<img
+								loading="lazy"
+								src={getItemImageUrl(item)}
+								alt={item.name}
+								class="h-full w-full object-cover"
+							/>
 							<div
 								class="flex hidden h-full w-full items-center justify-center rounded bg-muted font-mono text-xs"
 							>
