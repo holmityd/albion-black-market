@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import { Label } from '$lib/components/ui/label';
+	import { Input } from '$lib/components/ui/input';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { CITY_LIST, ITEM_CATEGORIES, SERVER_LIST } from '$lib/constants';
 
@@ -8,22 +9,26 @@
 		selectedCity: string;
 		selectedFile: string;
 		selectedServer: string;
+		highlightTime: number;
 		isLoading: boolean;
 		onSearch: () => void;
 		onCityChange: (city: string) => void;
 		onFileChange: (file: string) => void;
 		onServerChange: (server: string) => void;
+		onHighlightTimeChange: (time: number) => void;
 	}
 
 	let {
 		selectedCity = $bindable(),
 		selectedFile = $bindable(),
 		selectedServer = $bindable(),
+		highlightTime = $bindable(),
 		isLoading,
 		onSearch,
 		onCityChange,
 		onFileChange,
-		onServerChange
+		onServerChange,
+		onHighlightTimeChange
 	}: Props = $props();
 
 	// Initialize refs with null to avoid binding issues
@@ -56,9 +61,17 @@
 	function handleServerLabelClick() {
 		serverTriggerRef?.click();
 	}
+
+	function handleHighlightTimeChange(event: Event) {
+		const target = event.target as HTMLInputElement;
+		const value = parseInt(target.value, 10);
+		if (!isNaN(value) && value > 0) {
+			onHighlightTimeChange(value);
+		}
+	}
 </script>
 
-<div class="grid grid-cols-1 items-end gap-4 md:grid-cols-4">
+<div class="grid grid-cols-1 items-end gap-4 md:grid-cols-5">
 	<div class="space-y-2">
 		<Label class="cursor-pointer" onclick={handleServerLabelClick}>Server</Label>
 		<Select.Root type="single" name="server" bind:value={selectedServer} onValueChange={onServerChange}>
@@ -116,6 +129,20 @@
 				</Select.Group>
 			</Select.Content>
 		</Select.Root>
+	</div>
+
+	<div class="space-y-2">
+		<Label for="highlightTime">Highlight Time (hours)</Label>
+		<Input
+			id="highlightTime"
+			type="number"
+			min="1"
+			max="168"
+			value={highlightTime}
+			oninput={handleHighlightTimeChange}
+			class="w-full"
+			placeholder="8"
+		/>
 	</div>
 
 	<Button onclick={onSearch} disabled={isLoading} class="mb-2 w-full">

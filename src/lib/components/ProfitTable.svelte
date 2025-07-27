@@ -15,9 +15,10 @@
 
 	interface Props {
 		items: ProfitItem[];
+		highlightTime: number;
 	}
 
-	let { items }: Props = $props();
+	let { items, highlightTime }: Props = $props();
 
 	type SortField = 'name' | 'cityPrice' | 'blackMarketPrice' | 'profit';
 	type SortDirection = 'asc' | 'desc' | 'none';
@@ -124,8 +125,8 @@
 		const diffMs = now - timestamp;
 		const diffHours = diffMs / (1000 * 60 * 60);
 
-		if (diffHours > 8) {
-			return 'bg-red-500/50  border-red-300/50';
+		if (diffHours > highlightTime) {
+			return 'bg-red-500/50 border-red-300/50';
 		} else {
 			return 'bg-green-500/50 border-green-300/50';
 		}
