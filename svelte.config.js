@@ -14,7 +14,12 @@ const config = {
 			fallback: undefined,
 			precompress: false,
 			strict: true
-		})
+		}),
+		paths: {
+			base:
+				process.env.BASE_PATH ||
+				(process.env.NODE_ENV === 'production' ? '/albion-black-market' : '')
+		}
 	}
 };
 

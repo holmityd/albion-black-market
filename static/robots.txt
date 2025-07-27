@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Optional: Add sitemap when you create one
+# Sitemap: https://holmityd.github.io/albion-black-market/sitemap.xml
+
+# Block any future admin or private areas (if needed)
+# Disallow: /admin/
+# Disallow: /api/
