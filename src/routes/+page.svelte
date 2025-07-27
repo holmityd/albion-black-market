@@ -2,7 +2,8 @@
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import { TrendingUp } from 'lucide-svelte';
 	import { AlbionApiService } from '$lib/services/albionApi';
-	import { CLIENT_VERSION, CITY_LIST, FILE_LIST } from '$lib/constants/albion';
+	import { CLIENT_VERSION, CITY_LIST } from '$lib/constants/albion';
+	import { ITEM_CATEGORIES } from '$lib/constants/itemCategories';
 	import type { ProfitItem } from '$lib/types/albion';
 	import SearchForm from '$lib/components/SearchForm.svelte';
 	import ProfitTable from '$lib/components/ProfitTable.svelte';
@@ -10,7 +11,7 @@
 
 	// State variables
 	let selectedCity = $state(CITY_LIST[0]);
-	let selectedFile = $state(FILE_LIST[0]);
+	let selectedFile: string = $state(ITEM_CATEGORIES[0].value);
 	let profitList: ProfitItem[] = $state([]);
 	let sortDescending = $state(true);
 	let isLoading = $state(false);
@@ -34,7 +35,7 @@
 
 	function toggleSort() {
 		sortDescending = !sortDescending;
-		profitList = [...profitList].sort((a, b) => 
+		profitList = [...profitList].sort((a, b) =>
 			sortDescending ? b.profit - a.profit : a.profit - b.profit
 		);
 	}
@@ -48,7 +49,7 @@
 	}
 </script>
 
-<div class="container mx-auto p-6 space-y-6">
+<div class="container mx-auto space-y-6 p-6">
 	<Card>
 		<CardHeader>
 			<CardTitle class="flex items-center gap-2">

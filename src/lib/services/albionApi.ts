@@ -1,22 +1,43 @@
-import { DATA_ROUTE, TAX, QUALITY_LIST, ID_TO_NAME, ITEM_LISTS } from '$lib/constants/albion';
+import { DATA_ROUTE, TAX, QUALITY_LIST, BASE_ITEM_NAMES } from '$lib/constants/albion';
+import { getItemsByCategory, type ItemCategory } from '$lib/constants/itemCategories';
 import type { ProfitItem, MarketDataEntry } from '$lib/types/albion';
 
 export class AlbionApiService {
-	static async fetchMarketData(city: string, itemFile: string): Promise<ProfitItem[]> {
-		const itemList = ITEM_LISTS[itemFile] || [];
+	static async fetchMarketData(city: string, category: string): Promise<ProfitItem[]> {
+		const itemList = getItemsByCategory(category as ItemCategory);
 		if (itemList.length === 0) {
 			throw new Error('No items found for selected category');
 		}
 
-		const itemQuery = itemList.join(',');
+		// Split items into chunks of 100
+		const chunks = this.chunkArray(itemList, 100);
 
-		// Fetch city and black market prices in parallel
-		const [cityData, blackMarketData] = await Promise.all([
-			this.fetchPrices(itemQuery, city),
-			this.fetchPrices(itemQuery, 'blackmarket')
-		]);
+		// Fetch all chunks in parallel
+		const allCityData: MarketDataEntry[] = [];
+		const allBlackMarketData: MarketDataEntry[] = [];
 
-		return this.calculateProfits(cityData, blackMarketData);
+		for (const chunk of chunks) {
+			const itemQuery = chunk.join(',');
+
+			// Fetch city and black market prices for this chunk
+			const [cityData, blackMarketData] = await Promise.all([
+				this.fetchPrices(itemQuery, city),
+				this.fetchPrices(itemQuery, 'blackmarket')
+			]);
+
+			allCityData.push(...cityData);
+			allBlackMarketData.push(...blackMarketData);
+		}
+
+		return this.calculateProfits(allCityData, allBlackMarketData);
+	}
+
+	private static chunkArray<T>(array: T[], chunkSize: number): T[][] {
+		const chunks: T[][] = [];
+		for (let i = 0; i < array.length; i += chunkSize) {
+			chunks.push(array.slice(i, i + chunkSize));
+		}
+		return chunks;
 	}
 
 	private static async fetchPrices(
@@ -91,7 +112,7 @@ export class AlbionApiService {
 		const tier = id.startsWith('T') ? id[1] : '';
 		const quality = qualityStr ? QUALITY_LIST[parseInt(qualityStr) - 1] || 'normal' : 'normal';
 		const baseId = id.split('@')[0];
-		const name = ID_TO_NAME[baseId] || baseId;
+		const name = (BASE_ITEM_NAMES as any)[baseId] || baseId;
 
 		return { tier, enchant, quality, name };
 	}

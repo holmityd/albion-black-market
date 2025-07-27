@@ -11,6 +11,7 @@
 	import { TrendingUp } from 'lucide-svelte';
 	import { humanReadableValue } from '$lib/utils/formatters';
 	import type { ProfitItem } from '$lib/types/albion';
+	import { QUALITY_LIST } from '$lib/constants/albion';
 
 	interface Props {
 		items: ProfitItem[];
@@ -18,18 +19,9 @@
 
 	let { items }: Props = $props();
 
-	const qualityMap: Record<string, number> = {
-		normal: 1,
-		good: 2,
-		outstanding: 3,
-		excellent: 4,
-		masterpiece: 5
-	};
-
-	// Function to generate Albion Online item image URL with quality and enchantment
 	function getItemImageUrl(item: ProfitItem): string {
 		let identifier = item.id.substring(0, item.id.lastIndexOf('#'));
-		const qualityNumber = qualityMap[item.quality.toLowerCase()] || 1;
+		const qualityNumber = QUALITY_LIST.indexOf(item.quality.toLowerCase()) + 1;
 		return `https://render.albiononline.com/v1/item/${identifier}?quality=${qualityNumber}`;
 	}
 </script>
