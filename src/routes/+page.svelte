@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
-	import { TrendingUp } from 'lucide-svelte';
+	import { TrendingUp, Loader2 } from 'lucide-svelte';
 	import { AlbionApiService } from '$lib/services/albionApi';
 	import type { ProfitItem } from '$lib/types';
 	import SearchForm from '$lib/components/SearchForm.svelte';
@@ -12,7 +12,6 @@
 	let selectedCity = $state(CITY_LIST[0] as string);
 	let selectedFile: string = $state(ITEM_CATEGORIES[0].value);
 	let profitList: ProfitItem[] = $state([]);
-	let sortDescending = $state(true);
 	let isLoading = $state(false);
 	let error = $state('');
 
@@ -63,7 +62,21 @@
 		</CardContent>
 	</Card>
 
-	{#if profitList.length > 0}
+	<!-- Loading Indicator -->
+	{#if isLoading}
+		<Card>
+			<CardContent class="flex items-center justify-center py-12">
+				<div class="flex flex-col items-center gap-4 text-muted-foreground">
+					<Loader2 class="h-8 w-8 animate-spin" />
+					<div class="text-lg font-medium">Fetching market data...</div>
+					<div class="text-sm">This may take a few moments</div>
+				</div>
+			</CardContent>
+		</Card>
+	{/if}
+
+	<!-- Results Table -->
+	{#if profitList.length > 0 && !isLoading}
 		<Card>
 			<CardHeader>
 				<CardTitle>Profit Opportunities ({profitList.length} items)</CardTitle>
