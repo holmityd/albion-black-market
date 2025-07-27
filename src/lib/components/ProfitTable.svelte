@@ -24,6 +24,24 @@
 		const qualityNumber = QUALITY_LIST.indexOf(item.quality as Quality) + 1;
 		return `https://render.albiononline.com/v1/item/${identifier}?quality=${qualityNumber}`;
 	}
+
+	async function copyItemName(item: ProfitItem) {
+		try {
+			const itemName = item.name.split(',')[0]; // Get just the item name without quality
+			await navigator.clipboard.writeText(itemName);
+			// Optional: Show a brief visual feedback
+			console.log(`Copied: ${itemName}`);
+		} catch (err) {
+			console.error('Failed to copy item name:', err);
+			// Fallback for older browsers
+			const textArea = document.createElement('textarea');
+			textArea.value = item.name.split(',')[0];
+			document.body.appendChild(textArea);
+			textArea.select();
+			document.execCommand('copy');
+			document.body.removeChild(textArea);
+		}
+	}
 </script>
 
 <div class="rounded-md border">
@@ -39,7 +57,11 @@
 		</TableHeader>
 		<TableBody>
 			{#each items as item}
-				<TableRow>
+				<TableRow 
+					class="cursor-pointer hover:bg-muted/50 transition-colors" 
+					onclick={() => copyItemName(item)}
+					title="Click to copy item name"
+				>
 					<TableCell>
 						<div
 							class="flex h-12 w-12 items-center justify-center overflow-hidden rounded bg-muted"
