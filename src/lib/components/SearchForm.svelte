@@ -3,16 +3,12 @@
 	import { Label } from '$lib/components/ui/label';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { CITY_LIST, ITEM_CATEGORIES } from '$lib/constants';
-	import { ArrowUpDown } from 'lucide-svelte';
 
 	interface Props {
 		selectedCity: string;
 		selectedFile: string;
 		isLoading: boolean;
-		hasResults: boolean;
-		sortDescending: boolean;
 		onSearch: () => void;
-		onToggleSort: () => void;
 		onCityChange: (city: string) => void;
 		onFileChange: (file: string) => void;
 	}
@@ -21,10 +17,7 @@
 		selectedCity = $bindable(),
 		selectedFile = $bindable(),
 		isLoading,
-		hasResults,
-		sortDescending,
 		onSearch,
-		onToggleSort,
 		onCityChange,
 		onFileChange
 	}: Props = $props();
@@ -52,7 +45,7 @@
 	}
 </script>
 
-<div class="grid grid-cols-1 items-end gap-4 md:grid-cols-4">
+<div class="grid grid-cols-1 items-end gap-4 md:grid-cols-3">
 	<div class="space-y-2">
 		<Label class="cursor-pointer" onclick={handleCityLabelClick}>City</Label>
 		<Select.Root type="single" name="city" bind:value={selectedCity} onValueChange={onCityChange}>
@@ -97,11 +90,4 @@
 	<Button onclick={onSearch} disabled={isLoading} class="mb-2 w-full">
 		{isLoading ? 'Searching...' : 'Search'}
 	</Button>
-
-	{#if hasResults}
-		<Button variant="outline" onclick={onToggleSort} class="mb-2 w-full">
-			<ArrowUpDown class="mr-2 h-4 w-4" />
-			Sort Profit {sortDescending ? '↓' : '↑'}
-		</Button>
-	{/if}
 </div>

@@ -32,13 +32,6 @@
 		}
 	}
 
-	function toggleSort() {
-		sortDescending = !sortDescending;
-		profitList = [...profitList].sort((a, b) =>
-			sortDescending ? b.profit - a.profit : a.profit - b.profit
-		);
-	}
-
 	function handleCityChange(city: string) {
 		selectedCity = city;
 	}
@@ -61,10 +54,7 @@
 				bind:selectedCity
 				bind:selectedFile
 				{isLoading}
-				hasResults={profitList.length > 0}
-				{sortDescending}
 				onSearch={searchProfits}
-				onToggleSort={toggleSort}
 				onCityChange={handleCityChange}
 				onFileChange={handleFileChange}
 			/>
