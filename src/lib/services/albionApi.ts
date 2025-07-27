@@ -12,8 +12,8 @@ export class AlbionApiService {
 			throw new Error('No items found for selected category');
 		}
 
-		// Split items into chunks of 100
-		const chunks = this.chunkArray(itemList, 20);
+		// Split items into chunks
+		const chunks = this.chunkArray(itemList, 50);
 
 		// Fetch all chunks in parallel
 		const allCityData: MarketDataEntry[] = [];
