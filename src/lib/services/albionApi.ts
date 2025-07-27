@@ -1,6 +1,9 @@
-import { DATA_ROUTE, TAX, QUALITY_LIST, BASE_ITEM_NAMES } from '$lib/constants/albion';
-import { getItemsByCategory, type ItemCategory } from '$lib/constants/itemCategories';
-import type { ProfitItem, MarketDataEntry } from '$lib/types/albion';
+import { ALL_ITEMS_DATA, BASE_ITEM_NAMES, DATA_ROUTE, QUALITY_LIST, TAX } from '$lib/constants';
+import type { ProfitItem, MarketDataEntry, ItemCategory } from '$lib/types';
+
+function getItemsByCategory(category: ItemCategory): string[] {
+	return ALL_ITEMS_DATA[category] || [];
+}
 
 export class AlbionApiService {
 	static async fetchMarketData(city: string, category: string): Promise<ProfitItem[]> {

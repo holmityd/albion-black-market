@@ -10,8 +10,8 @@
 	} from '$lib/components/ui/table';
 	import { TrendingUp } from 'lucide-svelte';
 	import { humanReadableValue } from '$lib/utils/formatters';
-	import type { ProfitItem } from '$lib/types/albion';
-	import { QUALITY_LIST } from '$lib/constants/albion';
+	import type { ProfitItem, Quality } from '$lib/types';
+	import { QUALITY_LIST } from '$lib/constants';
 
 	interface Props {
 		items: ProfitItem[];
@@ -21,7 +21,7 @@
 
 	function getItemImageUrl(item: ProfitItem): string {
 		let identifier = item.id.substring(0, item.id.lastIndexOf('#'));
-		const qualityNumber = QUALITY_LIST.indexOf(item.quality.toLowerCase()) + 1;
+		const qualityNumber = QUALITY_LIST.indexOf(item.quality as Quality) + 1;
 		return `https://render.albiononline.com/v1/item/${identifier}?quality=${qualityNumber}`;
 	}
 </script>

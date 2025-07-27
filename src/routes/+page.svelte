@@ -2,15 +2,14 @@
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import { TrendingUp } from 'lucide-svelte';
 	import { AlbionApiService } from '$lib/services/albionApi';
-	import { CLIENT_VERSION, CITY_LIST } from '$lib/constants/albion';
-	import { ITEM_CATEGORIES } from '$lib/constants/itemCategories';
-	import type { ProfitItem } from '$lib/types/albion';
+	import type { ProfitItem } from '$lib/types';
 	import SearchForm from '$lib/components/SearchForm.svelte';
 	import ProfitTable from '$lib/components/ProfitTable.svelte';
 	import ErrorDisplay from '$lib/components/ErrorDisplay.svelte';
+	import { CITY_LIST, CLIENT_VERSION, ITEM_CATEGORIES } from '$lib/constants';
 
 	// State variables
-	let selectedCity = $state(CITY_LIST[0]);
+	let selectedCity = $state(CITY_LIST[0] as string);
 	let selectedFile: string = $state(ITEM_CATEGORIES[0].value);
 	let profitList: ProfitItem[] = $state([]);
 	let sortDescending = $state(true);

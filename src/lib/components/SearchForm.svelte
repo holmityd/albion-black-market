@@ -2,8 +2,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Label } from '$lib/components/ui/label';
 	import * as Select from '$lib/components/ui/select/index.js';
-	import { CITY_LIST } from '$lib/constants/albion';
-	import { ITEM_CATEGORIES } from '$lib/constants/itemCategories';
+	import { CITY_LIST, ITEM_CATEGORIES } from '$lib/constants';
 	import { ArrowUpDown } from 'lucide-svelte';
 
 	interface Props {
