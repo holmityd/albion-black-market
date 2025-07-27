@@ -7,7 +7,7 @@
 </script>
 
 {#if error}
-	<div class="bg-destructive/15 text-destructive px-4 py-3 rounded-md">
+	<div class="rounded-md bg-destructive/15 px-4 py-3 text-destructive">
 		{error}
 	</div>
 {/if}

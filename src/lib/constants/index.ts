@@ -33,4 +33,3 @@ export const ITEM_CATEGORIES: { value: ItemCategory; label: string }[] = [
 ];
 
 // Utility functions
-

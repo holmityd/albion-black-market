@@ -125,8 +125,8 @@
 		<TableHeader>
 			<TableRow>
 				<TableHead class="w-16">Item</TableHead>
-				<TableHead 
-					class="cursor-pointer select-none hover:bg-muted/50 transition-colors"
+				<TableHead
+					class="cursor-pointer transition-colors select-none hover:bg-muted/50"
 					onclick={() => handleSort('name')}
 					title="Click to sort by name"
 				>
@@ -138,8 +138,8 @@
 						{/if}
 					</div>
 				</TableHead>
-				<TableHead 
-					class="text-right cursor-pointer select-none hover:bg-muted/50 transition-colors"
+				<TableHead
+					class="cursor-pointer text-right transition-colors select-none hover:bg-muted/50"
 					onclick={() => handleSort('cityPrice')}
 					title="Click to sort by city price"
 				>
@@ -151,8 +151,8 @@
 						{/if}
 					</div>
 				</TableHead>
-				<TableHead 
-					class="text-right cursor-pointer select-none hover:bg-muted/50 transition-colors"
+				<TableHead
+					class="cursor-pointer text-right transition-colors select-none hover:bg-muted/50"
 					onclick={() => handleSort('blackMarketPrice')}
 					title="Click to sort by black market price"
 				>
@@ -164,8 +164,8 @@
 						{/if}
 					</div>
 				</TableHead>
-				<TableHead 
-					class="text-right cursor-pointer select-none hover:bg-muted/50 transition-colors"
+				<TableHead
+					class="cursor-pointer text-right transition-colors select-none hover:bg-muted/50"
 					onclick={() => handleSort('profit')}
 					title="Click to sort by profit"
 				>
@@ -181,8 +181,8 @@
 		</TableHeader>
 		<TableBody>
 			{#each sortedItems as item}
-				<TableRow 
-					class="cursor-pointer hover:bg-muted/50 transition-colors" 
+				<TableRow
+					class="cursor-pointer transition-colors hover:bg-muted/50"
 					onclick={() => copyItemName(item)}
 					title="Click to copy item name"
 				>
