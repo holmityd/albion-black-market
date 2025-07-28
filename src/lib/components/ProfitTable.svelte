@@ -12,6 +12,7 @@
 	import { formatTimeAgo, humanReadableValue } from '$lib/utils/formatters';
 	import type { ProfitItem, Quality } from '$lib/types';
 	import { QUALITY_LIST } from '$lib/constants';
+	import Tooltip from './Tooltip.svelte';
 
 	interface Props {
 		items: ProfitItem[];
@@ -143,57 +144,57 @@
 		<TableHeader>
 			<TableRow>
 				<TableHead class="w-16">Item</TableHead>
-				<TableHead
-					class="cursor-pointer transition-colors select-none hover:bg-muted/50"
-					onclick={() => handleSort('name')}
-					title="Click to sort by name"
-				>
-					<div class="flex items-center gap-1">
+				<TableHead class="select-none">
+					<Tooltip
+						title="Click to sort by name"
+						onclick={() => handleSort('name')}
+						class="inline-flex cursor-pointer items-center gap-1"
+					>
 						Name
 						{#if getSortIcon('name')}
 							{@const SortIcon = getSortIcon('name')}
 							<SortIcon class="h-4 w-4" />
 						{/if}
-					</div>
+					</Tooltip>
 				</TableHead>
-				<TableHead
-					class="cursor-pointer text-right transition-colors select-none hover:bg-muted/50"
-					onclick={() => handleSort('cityPrice')}
-					title="Click to sort by city price"
-				>
-					<div class="flex items-center justify-end gap-1">
+				<TableHead class="text-right select-none">
+					<Tooltip
+						title="Click to sort by city price"
+						onclick={() => handleSort('cityPrice')}
+						class="inline-flex cursor-pointer items-center justify-end gap-1"
+					>
 						City Price
 						{#if getSortIcon('cityPrice')}
 							{@const SortIcon = getSortIcon('cityPrice')}
 							<SortIcon class="h-4 w-4" />
 						{/if}
-					</div>
+					</Tooltip>
 				</TableHead>
-				<TableHead
-					class="cursor-pointer text-right transition-colors select-none hover:bg-muted/50"
-					onclick={() => handleSort('blackMarketPrice')}
-					title="Click to sort by black market price"
-				>
-					<div class="flex items-center justify-end gap-1">
+				<TableHead class="text-right select-none">
+					<Tooltip
+						title="Click to sort by black market price"
+						onclick={() => handleSort('blackMarketPrice')}
+						class="inline-flex cursor-pointer items-center justify-end gap-1"
+					>
 						Black Market
 						{#if getSortIcon('blackMarketPrice')}
 							{@const SortIcon = getSortIcon('blackMarketPrice')}
 							<SortIcon class="h-4 w-4" />
 						{/if}
-					</div>
+					</Tooltip>
 				</TableHead>
-				<TableHead
-					class="cursor-pointer text-right transition-colors select-none hover:bg-muted/50"
-					onclick={() => handleSort('profit')}
-					title="Click to sort by profit"
-				>
-					<div class="flex items-center justify-end gap-1">
+				<TableHead class="text-right select-none">
+					<Tooltip
+						title="Click to sort by profit"
+						onclick={() => handleSort('profit')}
+						class="inline-flex cursor-pointer items-center justify-end gap-1"
+					>
 						Profit
 						{#if getSortIcon('profit')}
 							{@const SortIcon = getSortIcon('profit')}
 							<SortIcon class="h-4 w-4" />
 						{/if}
-					</div>
+					</Tooltip>
 				</TableHead>
 			</TableRow>
 		</TableHeader>
