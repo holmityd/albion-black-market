@@ -88,7 +88,7 @@
 			</TableRow>
 		</TableHeader>
 		<TableBody>
-			{#each sortedItems() as item}
+			{#each sortedItems() as item (item.id)}
 				{#if shouldShowItem(item)}
 					<ProfitItemRow {item} {highlightTime} onCopyItemName={copyItemName} />
 				{/if}

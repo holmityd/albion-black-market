@@ -3,39 +3,19 @@ import type { ProfitItem, SortDirection, SortField } from '$lib/types';
 export function useSorting(items: ProfitItem[]) {
 	let sortField = $state<SortField | null>(null);
 	let sortDirection = $state<SortDirection>('none');
-	let sortedItems = $state<ProfitItem[]>([]);
 
-	// Initialize sorted items
-	$effect(() => {
-		sortedItems = [...items];
-	});
-
-	function handleSort(field: SortField) {
-		if (sortField === field) {
-			// Cycle through: none -> asc -> desc -> none
-			if (sortDirection === 'none') {
-				sortDirection = 'asc';
-			} else if (sortDirection === 'asc') {
-				sortDirection = 'desc';
-			} else {
-				sortDirection = 'none';
-				sortField = null;
-			}
-		} else {
-			sortField = field;
-			sortDirection = 'asc';
-		}
-
+	// Use $derived instead of $state and $effect
+	const sortedItems = $derived(() => {
 		if (sortDirection === 'none' || !sortField) {
 			// Reset to original order
-			sortedItems = [...items];
+			return [...items];
 		} else {
 			// Sort the items
-			sortedItems = [...items].sort((a, b) => {
+			return [...items].sort((a, b) => {
 				let aValue: string | number;
 				let bValue: string | number;
 
-				switch (field) {
+				switch (sortField) {
 					case 'name':
 						aValue = a.name.split(',')[0].toLowerCase();
 						bValue = b.name.split(',')[0].toLowerCase();
@@ -65,12 +45,29 @@ export function useSorting(items: ProfitItem[]) {
 				}
 			});
 		}
+	});
+
+	function handleSort(field: SortField) {
+		if (sortField === field) {
+			// Cycle through: none -> asc -> desc -> none
+			if (sortDirection === 'none') {
+				sortDirection = 'asc';
+			} else if (sortDirection === 'asc') {
+				sortDirection = 'desc';
+			} else {
+				sortDirection = 'none';
+				sortField = null;
+			}
+		} else {
+			sortField = field;
+			sortDirection = 'asc';
+		}
 	}
 
 	return {
 		sortField: () => sortField,
 		sortDirection: () => sortDirection,
-		sortedItems: () => sortedItems,
+		sortedItems,
 		handleSort
 	};
 }

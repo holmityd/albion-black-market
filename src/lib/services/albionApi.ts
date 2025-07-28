@@ -138,7 +138,7 @@ export class AlbionApiService {
 		const tier = id.startsWith('T') ? id[1] : '';
 		const quality = qualityStr ? QUALITY_LIST[parseInt(qualityStr) - 1] || 'normal' : 'normal';
 		const baseId = id.split('@')[0];
-		const name = (BASE_ITEM_NAMES as any)[baseId] || baseId;
+		const name = (BASE_ITEM_NAMES as Record<string, string>)[baseId] || baseId;
 
 		return { tier, enchant, quality, name };
 	}
