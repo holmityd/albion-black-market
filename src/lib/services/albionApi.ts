@@ -6,7 +6,11 @@ function getItemsByCategory(category: ItemCategory): string[] {
 }
 
 export class AlbionApiService {
-	static async fetchMarketData(city: string, category: string, serverUrl: string): Promise<ProfitItem[]> {
+	static async fetchMarketData(
+		city: string,
+		category: string,
+		serverUrl: string
+	): Promise<ProfitItem[]> {
 		const itemList = getItemsByCategory(category as ItemCategory);
 		if (itemList.length === 0) {
 			throw new Error('No items found for selected category');
@@ -79,13 +83,13 @@ export class AlbionApiService {
 			if (cityValues.length > 0 && entry.buy_price_max) {
 				const minCityValue = Math.min(...cityValues);
 				// Find the corresponding city entry for the date
-				const cityEntryKey = itemsToPurchase.find(key => offerDict[key]?.[0] === minCityValue);
+				const cityEntryKey = itemsToPurchase.find((key) => offerDict[key]?.[0] === minCityValue);
 				const existingCityDate = cityEntryKey ? offerDict[cityEntryKey]?.[2] : undefined;
-				
+
 				offerDict[itemsToPurchase[0]] = [
-					minCityValue, 
-					entry.buy_price_max, 
-					existingCityDate, 
+					minCityValue,
+					entry.buy_price_max,
+					existingCityDate,
 					entry.buy_price_max_date
 				];
 			}
@@ -93,7 +97,13 @@ export class AlbionApiService {
 
 		// Calculate profits
 		const results: ProfitItem[] = [];
-		for (const [itemKey, [cityPrice, blackMarketPrice, cityPriceDate, blackMarketPriceDate]] of Object.entries(offerDict)) {
+		// Calculate timezone offset once outside the loop
+		const timezoneOffsetMs = new Date().getTimezoneOffset() * 60 * 1000;
+		
+		for (const [
+			itemKey,
+			[cityPrice, blackMarketPrice, cityPriceDate, blackMarketPriceDate]
+		] of Object.entries(offerDict)) {
 			if (blackMarketPrice > 0) {
 				const profit = Math.round(blackMarketPrice * (1 - TAX) - cityPrice);
 				if (profit > 0) {
@@ -102,9 +112,9 @@ export class AlbionApiService {
 						id: itemKey,
 						name: `${tier}.${enchant} ${name}, ${quality}`,
 						cityPrice,
-						cityPriceDate: new Date(cityPriceDate||'').getTime(),
+						cityPriceDate: new Date(cityPriceDate || '').getTime() - timezoneOffsetMs,
 						blackMarketPrice,
-						blackMarketPriceDate: new Date(blackMarketPriceDate||'').getTime(),
+						blackMarketPriceDate: new Date(blackMarketPriceDate || '').getTime() - timezoneOffsetMs,
 						profit,
 						tier,
 						enchant,

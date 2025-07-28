@@ -122,7 +122,7 @@
 	}
 
 	function isTimeInRange(timestamp: number): boolean {
-		const now = Date.now();
+		const now = new Date().getTime();
 		const diffMs = now - timestamp;
 		const diffHours = diffMs / (1000 * 60 * 60);
 
