@@ -26,3 +26,6 @@ export type ItemCategory = keyof typeof ALL_ITEMS_DATA;
 export type City = (typeof CITY_LIST)[number];
 export type Quality = (typeof QUALITY_LIST)[number];
 export type Server = (typeof SERVER_LIST)[number]['value'];
+
+export type SortField = 'name' | 'cityPrice' | 'blackMarketPrice' | 'profit';
+export type SortDirection = 'asc' | 'desc' | 'none';
