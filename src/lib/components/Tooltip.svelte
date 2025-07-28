@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as Tooltip from '$lib/components/ui/tooltip';
-	let { title, children, ...restProps }: Props = $props();
+	let { title, children, ...restProps } = $props();
 </script>
 
 <Tooltip.Provider>

@@ -34,5 +34,5 @@ export const ITEM_CATEGORIES: { value: ItemCategory; label: string }[] = [
 export const SERVER_LIST = [
 	{ value: 'https://europe.albion-online-data.com', label: 'Europe' },
 	{ value: 'https://west.albion-online-data.com', label: 'America' },
-	{ value: 'https://east.albion-online-data.com', label: 'Asia' },
+	{ value: 'https://east.albion-online-data.com', label: 'Asia' }
 ] as const;

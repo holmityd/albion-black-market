@@ -4,9 +4,9 @@ export interface ProfitItem {
 	id: string;
 	name: string;
 	cityPrice: number;
-	cityPriceDate:number;
+	cityPriceDate: number;
 	blackMarketPrice: number;
-	blackMarketPriceDate:number;
+	blackMarketPriceDate: number;
 	profit: number;
 	tier: string;
 	enchant: string;

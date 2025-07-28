@@ -99,7 +99,7 @@ export class AlbionApiService {
 		const results: ProfitItem[] = [];
 		// Calculate timezone offset once outside the loop
 		const timezoneOffsetMs = new Date().getTimezoneOffset() * 60 * 1000;
-		
+
 		for (const [
 			itemKey,
 			[cityPrice, blackMarketPrice, cityPriceDate, blackMarketPriceDate]
