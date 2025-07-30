@@ -1,5 +1,6 @@
 import { ALL_ITEMS_DATA, BASE_ITEM_NAMES, QUALITY_LIST, TAX } from '$lib/constants';
 import type { ProfitItem, MarketDataEntry, ItemCategory } from '$lib/types';
+import { parseItemName } from '$lib/utils/formatters';
 
 function getItemsByCategory(category: ItemCategory): string[] {
 	return ALL_ITEMS_DATA[category] || [];
@@ -107,7 +108,7 @@ export class AlbionApiService {
 			if (blackMarketPrice > 0) {
 				const profit = Math.round(blackMarketPrice * (1 - TAX) - cityPrice);
 				if (profit > 0) {
-					const { tier, enchant, quality, name } = this.parseItemName(itemKey);
+					const { tier, enchant, quality, name } = parseItemName(itemKey);
 					results.push({
 						id: itemKey,
 						name: `${tier}.${enchant} ${name}, ${quality}`,
@@ -125,21 +126,5 @@ export class AlbionApiService {
 		}
 
 		return results.sort((a, b) => b.profit - a.profit);
-	}
-
-	private static parseItemName(itemId: string): {
-		tier: string;
-		enchant: string;
-		quality: string;
-		name: string;
-	} {
-		const [id, qualityStr] = itemId.split('#');
-		const enchant = id.includes('@') ? id.split('@')[1] : '0';
-		const tier = id.startsWith('T') ? id[1] : '';
-		const quality = qualityStr ? QUALITY_LIST[parseInt(qualityStr) - 1] || 'normal' : 'normal';
-		const baseId = id.split('@')[0];
-		const name = (BASE_ITEM_NAMES as Record<string, string>)[baseId] || baseId;
-
-		return { tier, enchant, quality, name };
 	}
 }
