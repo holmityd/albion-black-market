@@ -1,195 +1,39 @@
-const newNames = new Set([
-    "T2_CLOTH",
-    "T2_LEATHER",
-    "T2_METALBAR",
-    "T2_PLANKS",
-    "T1_HIDE",
-    "T1_ROCK",
-    "T1_WOOD",
-    "T3_CLOTH",
-    "T3_LEATHER",
-    "T3_METALBAR",
-    "T3_PLANKS",
-    "T4_CLOTH",
-    "T4_LEATHER",
-    "T4_CLOTH_LEVEL1",
-    "T4_LEATHER_LEVEL1",
-    "T4_CLOTH_LEVEL2",
-    "T4_LEATHER_LEVEL2",
-    "T4_CLOTH_LEVEL3",
-    "T4_LEATHER_LEVEL3",
-    "T4_CLOTH_LEVEL4",
-    "T4_LEATHER_LEVEL4",
-    "T4_CAPE",
-    "T4_CAPEITEM_FW_BRIDGEWATCH_BP",
-    "T1_FACTION_STEPPE_TOKEN_1",
-    "T4_CAPEITEM_FW_FORTSTERLING_BP",
-    "T1_FACTION_MOUNTAIN_TOKEN_1",
-    "T4_CAPEITEM_FW_LYMHURST_BP",
-    "T1_FACTION_FOREST_TOKEN_1",
-    "T4_CAPEITEM_FW_MARTLOCK_BP",
-    "T1_FACTION_HIGHLAND_TOKEN_1",
-    "T4_CAPEITEM_FW_THETFORD_BP",
-    "T1_FACTION_SWAMP_TOKEN_1",
-    "T4_ARTEFACT_TOKEN_FAVOR_1",
-    "T4_ARTEFACT_TOKEN_FAVOR_2",
-    "T4_ARTEFACT_TOKEN_FAVOR_3",
-    "T4_METALBAR",
-    "T4_METALBAR_LEVEL1",
-    "T4_METALBAR_LEVEL2",
-    "T4_METALBAR_LEVEL3",
-    "T4_METALBAR_LEVEL4",
-    "T4_PLANKS",
-    "T4_PLANKS_LEVEL1",
-    "T4_PLANKS_LEVEL2",
-    "T4_PLANKS_LEVEL3",
-    "T4_PLANKS_LEVEL4",
-    "T5_CLOTH",
-    "T5_LEATHER",
-    "T5_CLOTH_LEVEL1",
-    "T5_LEATHER_LEVEL1",
-    "T5_CLOTH_LEVEL2",
-    "T5_LEATHER_LEVEL2",
-    "T5_CLOTH_LEVEL3",
-    "T5_LEATHER_LEVEL3",
-    "T5_CLOTH_LEVEL4",
-    "T5_LEATHER_LEVEL4",
-    "T5_CAPE",
-    "T5_CAPEITEM_FW_BRIDGEWATCH_BP",
-    "T5_CAPEITEM_FW_FORTSTERLING_BP",
-    "T5_CAPEITEM_FW_LYMHURST_BP",
-    "T5_CAPEITEM_FW_MARTLOCK_BP",
-    "T5_CAPEITEM_FW_THETFORD_BP",
-    "T5_ARTEFACT_TOKEN_FAVOR_1",
-    "T5_ARTEFACT_TOKEN_FAVOR_3",
-    "T5_ARTEFACT_TOKEN_FAVOR_2",
-    "T5_METALBAR",
-    "T5_METALBAR_LEVEL1",
-    "T5_METALBAR_LEVEL2",
-    "T5_METALBAR_LEVEL3",
-    "T5_METALBAR_LEVEL4",
-    "T5_PLANKS",
-    "T5_PLANKS_LEVEL1",
-    "T5_PLANKS_LEVEL2",
-    "T5_PLANKS_LEVEL3",
-    "T5_PLANKS_LEVEL4",
-    "T6_CLOTH",
-    "T6_LEATHER",
-    "T6_CLOTH_LEVEL1",
-    "T6_LEATHER_LEVEL1",
-    "T6_CLOTH_LEVEL2",
-    "T6_LEATHER_LEVEL2",
-    "T6_CLOTH_LEVEL3",
-    "T6_LEATHER_LEVEL3",
-    "T6_CLOTH_LEVEL4",
-    "T6_LEATHER_LEVEL4",
-    "T6_CAPE",
-    "T6_CAPEITEM_FW_BRIDGEWATCH_BP",
-    "T6_CAPEITEM_FW_FORTSTERLING_BP",
-    "T6_CAPEITEM_FW_LYMHURST_BP",
-    "T6_CAPEITEM_FW_MARTLOCK_BP",
-    "T6_CAPEITEM_FW_THETFORD_BP",
-    "T6_ARTEFACT_TOKEN_FAVOR_1",
-    "T6_ARTEFACT_TOKEN_FAVOR_2",
-    "T6_ARTEFACT_TOKEN_FAVOR_3",
-    "T6_METALBAR",
-    "T6_METALBAR_LEVEL1",
-    "T6_METALBAR_LEVEL2",
-    "T6_METALBAR_LEVEL3",
-    "T6_METALBAR_LEVEL4",
-    "T6_PLANKS",
-    "T6_PLANKS_LEVEL1",
-    "T6_PLANKS_LEVEL2",
-    "T6_PLANKS_LEVEL3",
-    "T6_PLANKS_LEVEL4",
-    "T7_CLOTH",
-    "T7_LEATHER",
-    "T7_CLOTH_LEVEL1",
-    "T7_LEATHER_LEVEL1",
-    "T7_CLOTH_LEVEL2",
-    "T7_LEATHER_LEVEL2",
-    "T7_CLOTH_LEVEL3",
-    "T7_LEATHER_LEVEL3",
-    "T7_CLOTH_LEVEL4",
-    "T7_LEATHER_LEVEL4",
-    "T7_CAPE",
-    "T7_CAPEITEM_FW_BRIDGEWATCH_BP",
-    "T7_CAPEITEM_FW_FORTSTERLING_BP",
-    "T7_CAPEITEM_FW_LYMHURST_BP",
-    "T7_CAPEITEM_FW_MARTLOCK_BP",
-    "T7_CAPEITEM_FW_THETFORD_BP",
-    "T7_ARTEFACT_TOKEN_FAVOR_1",
-    "T7_ARTEFACT_TOKEN_FAVOR_3",
-    "T7_ARTEFACT_TOKEN_FAVOR_2",
-    "T7_METALBAR",
-    "T7_METALBAR_LEVEL1",
-    "T7_METALBAR_LEVEL2",
-    "T7_METALBAR_LEVEL3",
-    "T7_METALBAR_LEVEL4",
-    "T7_PLANKS",
-    "T7_PLANKS_LEVEL1",
-    "T7_PLANKS_LEVEL2",
-    "T7_PLANKS_LEVEL3",
-    "T7_PLANKS_LEVEL4",
-    "T8_CLOTH",
-    "T8_LEATHER",
-    "T8_CLOTH_LEVEL1",
-    "T8_LEATHER_LEVEL1",
-    "T8_CLOTH_LEVEL2",
-    "T8_LEATHER_LEVEL2",
-    "T8_CLOTH_LEVEL3",
-    "T8_LEATHER_LEVEL3",
-    "T8_CLOTH_LEVEL4",
-    "T8_LEATHER_LEVEL4",
-    "T8_CAPE",
-    "T8_CAPEITEM_FW_BRIDGEWATCH_BP",
-    "T8_CAPEITEM_FW_FORTSTERLING_BP",
-    "T8_CAPEITEM_FW_LYMHURST_BP",
-    "T8_CAPEITEM_FW_MARTLOCK_BP",
-    "T8_CAPEITEM_FW_THETFORD_BP",
-    "T8_ARTEFACT_TOKEN_FAVOR_1",
-    "T8_ARTEFACT_TOKEN_FAVOR_2",
-    "T8_ARTEFACT_TOKEN_FAVOR_3",
-    "T8_METALBAR",
-    "T8_METALBAR_LEVEL1",
-    "T8_METALBAR_LEVEL2",
-    "T8_METALBAR_LEVEL3",
-    "T8_METALBAR_LEVEL4",
-    "T8_PLANKS",
-    "T8_PLANKS_LEVEL1",
-    "T8_PLANKS_LEVEL2",
-    "T8_PLANKS_LEVEL3",
-    "T8_PLANKS_LEVEL4"
-])
-
 import fs from 'node:fs';
 import { AlbionItemInfo } from './types';
 import { getJson } from '../src/lib/utils/fetch';
+import all from '../src/lib/constants/crafting-data.json';
+
+const uniqueNames = new Set<string>();
+for (const item of Object.keys(all)) {
+	const itemId = item.split('@')[0];
+	uniqueNames.add(itemId);
+}
 
 const filePath = './src/lib/constants/base_item_names.json';
 const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
 async function getItemInfo(item: string) {
-    return getJson<AlbionItemInfo>('https://gameinfo.albiononline.com/api/gameinfo/items/' + item + '/data')
+	return getJson<AlbionItemInfo>(
+		'https://gameinfo.albiononline.com/api/gameinfo/items/' + item + '/data'
+	);
 }
 
-const itemsArr = Array.from(newNames);
-
+// const itemsArr = Array.from(uniqueNames);
+const itemsArr = ['T4_ARTEFACT_2H_BOW_CRYSTAL'];
 
 async function update() {
-    for (let i = 0; i < itemsArr.length; i++) {
-        console.log(`${i}/${itemsArr.length}`);
-        const item = itemsArr[i];
-        if (data[item]) continue;
-        try {
-            const info = await getItemInfo(item);
-            data[item] = info.localizedNames["EN-US"];
-        } catch { }
+	for (let i = 0; i < itemsArr.length; i++) {
+		console.log(`${i}/${itemsArr.length}`);
+		const item = itemsArr[i];
+		if (data[item]) continue;
+		try {
+			const info = await getItemInfo(item);
+			data[item] = info.localizedNames['EN-US'];
+		} catch {}
+	}
 
-    }
+	fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-
-    console.log('done');
+	console.log('done');
 }
 
 update();

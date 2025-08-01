@@ -17,6 +17,29 @@
 	import { humanReadableValue, parseItemName } from '$lib/utils/formatters';
 	import { Loader2, TrendingUp } from 'lucide-svelte';
 	import { onMount } from 'svelte';
+	import category_tree from '$lib/constants/category_tree.json';
+	import Input from '$lib/components/ui/input/input.svelte';
+
+	const categoryTree = category_tree as Record<string, Record<string, string[]>>;
+
+	const categories = Object.keys(categoryTree);
+	let selectedCategory = $state(categories[0]);
+	const subCategories = $derived(Object.keys(categoryTree[selectedCategory]));
+	let selectedSubCategory = $state('');
+	$effect(() => {
+		const newSubCategories = Object.keys(categoryTree[selectedCategory] || {});
+		selectedSubCategory = newSubCategories[0] || '';
+	});
+
+	// Handle category change
+	function handleCategoryChange(category: string) {
+		selectedCategory = category;
+	}
+
+	// Handle subcategory change
+	function handleSubCategoryChange(subCategory: string) {
+		selectedSubCategory = subCategory;
+	}
 
 	const dataByTiers = (() => {
 		const result: Record<string, Record<string, { resources: (string | number)[] }>> = {};
@@ -39,7 +62,30 @@
 
 	let isLoading = $state(false);
 	let selectedTier = $state('T1');
-	let craftPrices = $state<Record<string, number>>({});
+	const craftPrices = $derived.by(() => {
+		const newCraftPrices: Record<string, number> = {};
+
+		for (const [item, info] of Object.entries(selectedTierData)) {
+			let craftPrice = 0;
+			const resources = info.resources;
+			for (let i = 0; i < resources.length; i = i + 2) {
+				const resource = resources[i] as string;
+				const count = resources[i + 1] as number;
+				if (resourcePrices[resource]) {
+					craftPrice += Math.round(
+						count * resourcePrices[resource] -
+							(count > 1 ? count * resourcePrices[resource] * 0.15 : 0)
+					);
+				} else {
+					craftPrice = 0;
+				}
+			}
+			newCraftPrices[item] = craftPrice;
+		}
+
+		return newCraftPrices;
+	});
+	// let craftPrices = $state<Record<string, number>>({});
 	let itemPrices = $state<Record<string, number>>({});
 	let sortColumn = $state<'name' | 'craftPrice' | 'itemPrice' | 'profit' | null>(null);
 	let sortDirection = $state<'asc' | 'desc'>('asc');
@@ -48,7 +94,35 @@
 		(tier) => Object.keys(dataByTiers[tier]).length > 0
 	);
 
-	const selectedTierData = $derived(dataByTiers[selectedTier] || {});
+	const selectedTierData = $derived.by(() => {
+		const tierData = dataByTiers[selectedTier] || {};
+
+		// If no category or subcategory is selected, return all items
+		if (!selectedCategory || !selectedSubCategory) {
+			return tierData;
+		}
+
+		// Get the item IDs for the selected subcategory
+		const subcategoryItems = categoryTree[selectedCategory]?.[selectedSubCategory] || [];
+
+		// Filter tierData to only include items that match the subcategory
+		const filteredData: Record<string, { resources: (string | number)[] }> = {};
+
+		for (const [itemId, itemData] of Object.entries(tierData)) {
+			// Check if this item (without enchantment suffix) is in the subcategory
+			const baseItemId = itemId.split('@')[0]; // Remove enchantment level if present
+			const isInSubcategory = subcategoryItems.some((subcatItem) => {
+				const baseSubcatItem = subcatItem.split('@')[0];
+				return baseItemId === baseSubcatItem;
+			});
+
+			if (isInSubcategory) {
+				filteredData[itemId] = itemData;
+			}
+		}
+
+		return filteredData;
+	});
 	const sortedItems = $derived.by(() => {
 		const items = Object.entries(selectedTierData);
 
@@ -108,6 +182,8 @@
 		availableTiers.find((tier) => tier === selectedTier) ?? 'Select tier'
 	);
 
+	let resourcePrices: Record<string, number> = $state({});
+
 	// Ref for trigger
 	let tierTriggerRef = $state<HTMLButtonElement | null>(null);
 
@@ -115,11 +191,9 @@
 	async function handleTierChange(tier: string) {
 		isLoading = true;
 		selectedTier = tier;
-		// Reset craft prices when tier changes
-		craftPrices = {};
 
 		const resources = new Set();
-		for (const info of Object.values(dataByTiers[tier])) {
+		for (const info of Object.values(selectedTierData)) {
 			for (let i = 0; i < info.resources.length; i = i + 2) {
 				const resource = info.resources[i] as string;
 				if (resource.includes('LEVEL')) {
@@ -136,7 +210,7 @@
 			SERVER_LIST[0].value
 		);
 
-		const resourcePrices: Record<string, number> = {};
+		resourcePrices = {};
 
 		for (const entry of resourceData) {
 			const itemKey = entry.item_id.includes('LEVEL') ? entry.item_id.split('@')[0] : entry.item_id;
@@ -144,31 +218,6 @@
 				resourcePrices[itemKey] = entry.sell_price_min;
 			}
 		}
-
-		console.log(resourcePrices);
-
-		// Create new craft prices object to trigger reactivity
-		const newCraftPrices: Record<string, number> = {};
-		for (const [item, info] of Object.entries(selectedTierData)) {
-			let craftPrice = 0;
-			const resources = info.resources;
-			for (let i = 0; i < resources.length; i = i + 2) {
-				const resource = resources[i] as string;
-				const count = resources[i + 1] as number;
-				if (resourcePrices[resource]) {
-					craftPrice += Math.round(
-						count * resourcePrices[resource] -
-							(count > 1 ? count * resourcePrices[resource] * 0.15 : 0)
-					);
-				} else {
-					craftPrice = 0;
-				}
-			}
-			newCraftPrices[item] = craftPrice;
-		}
-
-		// Update the reactive state
-		craftPrices = newCraftPrices;
 
 		// Batch items into groups of 50
 		const itemsArr = Object.keys(dataByTiers[tier]);
@@ -227,33 +276,87 @@
 	onMount(() => {
 		handleTierChange(Object.keys(dataByTiers)[0]);
 	});
+
+	let editingItem = $state<string | null>(null);
 </script>
 
 <div class="container mx-auto p-6">
 	<h1 class="mb-6 text-3xl font-bold">Crafting Data</h1>
 
-	<!-- Tier Selector -->
-	<div class="mb-6 space-y-2">
-		<Label class="cursor-pointer" onclick={handleTierLabelClick}>Select Tier:</Label>
-		<Select.Root
-			type="single"
-			name="tier"
-			bind:value={selectedTier}
-			onValueChange={handleTierChange}
-		>
-			<Select.Trigger bind:ref={tierTriggerRef} class="w-[180px]" aria-label="Select tier">
-				{tierTriggerContent}
-			</Select.Trigger>
-			<Select.Content>
-				<Select.Group>
-					{#each availableTiers as tier (tier)}
-						<Select.Item value={tier} label={tier}>
-							{tier}
-						</Select.Item>
-					{/each}
-				</Select.Group>
-			</Select.Content>
-		</Select.Root>
+	<!-- Category and Subcategory Selectors -->
+	<div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+		<!-- Category Selector -->
+		<div class="space-y-2">
+			<Label>Category:</Label>
+			<Select.Root
+				type="single"
+				name="category"
+				bind:value={selectedCategory}
+				onValueChange={handleCategoryChange}
+			>
+				<Select.Trigger class="w-full" aria-label="Select category">
+					{selectedCategory || 'Select category'}
+				</Select.Trigger>
+				<Select.Content>
+					<Select.Group>
+						{#each categories as category (category)}
+							<Select.Item value={category} label={category}>
+								{category.charAt(0).toUpperCase() + category.slice(1)}
+							</Select.Item>
+						{/each}
+					</Select.Group>
+				</Select.Content>
+			</Select.Root>
+		</div>
+
+		<!-- Subcategory Selector -->
+		<div class="space-y-2">
+			<Label>Subcategory:</Label>
+			<Select.Root
+				type="single"
+				name="subcategory"
+				bind:value={selectedSubCategory}
+				onValueChange={handleSubCategoryChange}
+				disabled={!selectedCategory || subCategories.length === 0}
+			>
+				<Select.Trigger class="w-full" aria-label="Select subcategory">
+					{selectedSubCategory || 'Select subcategory'}
+				</Select.Trigger>
+				<Select.Content>
+					<Select.Group>
+						{#each subCategories as subCategory (subCategory)}
+							<Select.Item value={subCategory} label={subCategory}>
+								{subCategory.charAt(0).toUpperCase() + subCategory.slice(1)}
+							</Select.Item>
+						{/each}
+					</Select.Group>
+				</Select.Content>
+			</Select.Root>
+		</div>
+
+		<!-- Tier Selector -->
+		<div class="space-y-2">
+			<Label class="cursor-pointer" onclick={handleTierLabelClick}>Tier:</Label>
+			<Select.Root
+				type="single"
+				name="tier"
+				bind:value={selectedTier}
+				onValueChange={handleTierChange}
+			>
+				<Select.Trigger bind:ref={tierTriggerRef} class="w-full" aria-label="Select tier">
+					{tierTriggerContent}
+				</Select.Trigger>
+				<Select.Content>
+					<Select.Group>
+						{#each availableTiers as tier (tier)}
+							<Select.Item value={tier} label={tier}>
+								{tier}
+							</Select.Item>
+						{/each}
+					</Select.Group>
+				</Select.Content>
+			</Select.Root>
+		</div>
 	</div>
 
 	{#if isLoading}
@@ -266,6 +369,81 @@
 				</div>
 			</CardContent>
 		</Card>
+	{/if}
+
+	<!-- Resource Prices Table -->
+	{#if Object.keys(resourcePrices).length > 0 && !isLoading}
+		<div class="mb-6">
+			<h2 class="mb-4 text-xl font-semibold">Resource Prices</h2>
+			<div class="rounded-md border">
+				<Table>
+					<TableHeader>
+						<TableRow>
+							<TableHead>Resource</TableHead>
+							<TableHead>Name</TableHead>
+							<TableHead>Price</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						{#each Object.keys(resourcePrices) as item (item)}
+							<TableRow class="hover:bg-muted/50">
+								<TableCell class="font-medium">
+									<div
+										class="flex h-10 w-10 items-center justify-center overflow-hidden rounded bg-muted"
+									>
+										<img
+											loading="lazy"
+											src={getItemImageUrl(item)}
+											alt={item}
+											class="h-full w-full object-cover"
+										/>
+									</div>
+								</TableCell>
+								<TableCell>
+									{@const info = parseItemName(item)}
+									{info.tier}.{info.enchant}
+									{info.name}
+								</TableCell>
+								<TableCell>
+									{#if editingItem === item}
+										<Input
+											type="number"
+											value={resourcePrices[item] || ''}
+											onchange={(e) => {
+												const value = parseFloat(e.currentTarget.value) || 0;
+												resourcePrices = { ...resourcePrices, [item]: value };
+											}}
+											onblur={() => {
+												editingItem = null;
+											}}
+											onkeydown={(e) => {
+												if (e.key === 'Enter' || e.key === 'Escape') {
+													e.currentTarget.blur();
+												}
+											}}
+											placeholder="Enter price"
+											class="w-24"
+											autofocus
+										/>
+									{:else}
+										<button
+											type="button"
+											class="cursor-pointer rounded px-2 py-1 text-left hover:bg-muted/50 focus:ring-2 focus:ring-ring focus:outline-none"
+											onclick={() => {
+												editingItem = item;
+											}}
+											tabindex="0"
+										>
+											{humanReadableValue(resourcePrices[item])}
+										</button>
+									{/if}
+								</TableCell>
+							</TableRow>
+						{/each}
+					</TableBody>
+				</Table>
+			</div>
+		</div>
 	{/if}
 
 	<!-- Crafting Table -->
@@ -326,58 +504,92 @@
 					{#each sortedItems as [item, info] (item)}
 						{@const craftPrice = craftPrices[item]}
 						{@const itemPrice = itemPrices[item]}
-						{@const profit =
-							craftPrice && itemPrice
-								? itemPrice - Math.round(itemPrice * 0.105) - craftPrice
-								: undefined}
-						{#if profit && profit > 0}
-							<TableRow class="hover:bg-muted/50">
-								<TableCell class="font-medium">
-									<div
-										class="flex h-12 w-12 items-center justify-center overflow-hidden rounded bg-muted"
+
+						<TableRow class="hover:bg-muted/50">
+							<TableCell class="font-medium">
+								<div
+									class="flex h-12 w-12 items-center justify-center overflow-hidden rounded bg-muted"
+								>
+									<img
+										loading="lazy"
+										src={getItemImageUrl(item)}
+										alt={item}
+										class="h-full w-full object-cover"
+									/>
+								</div>
+							</TableCell>
+							<TableCell class="font-medium">
+								{@const info = parseItemName(item)}
+								{info.tier}.{info.enchant}
+								{info.name}
+							</TableCell>
+							<TableCell>
+								<div class="flex flex-col flex-wrap gap-2">
+									{#each info.resources as requirement, index}
+										{#if index % 2 === 0}
+											<div class="flex items-center space-x-2">
+												<span class="text-sm font-medium"
+													>{parseItemName(requirement as string).name}</span
+												>
+												{#if info.resources[index + 1]}
+													<Badge variant="secondary" class="text-xs">
+														×{info.resources[index + 1]}
+													</Badge>
+												{/if}
+											</div>
+										{/if}
+									{/each}
+								</div>
+							</TableCell>
+							<TableCell>{craftPrice ? humanReadableValue(craftPrice) : '-'}</TableCell>
+							<TableCell>
+								{#if editingItem === item}
+									<Input
+										type="number"
+										value={itemPrices[item] || ''}
+										onchange={(e) => {
+											const value = parseFloat(e.currentTarget.value) || 0;
+											itemPrices = { ...itemPrices, [item]: value };
+										}}
+										onblur={() => {
+											editingItem = null;
+										}}
+										onkeydown={(e) => {
+											if (e.key === 'Enter' || e.key === 'Escape') {
+												e.currentTarget.blur();
+											}
+										}}
+										placeholder="Enter price"
+										class="w-24"
+										autofocus
+									/>
+								{:else}
+									<button
+										type="button"
+										class="cursor-pointer rounded px-2 py-1 text-left hover:bg-muted/50 focus:ring-2 focus:ring-ring focus:outline-none"
+										onclick={() => {
+											editingItem = item;
+										}}
+										tabindex="0"
 									>
-										<img
-											loading="lazy"
-											src={getItemImageUrl(item)}
-											alt={item}
-											class="h-full w-full object-cover"
-										/>
-									</div>
-								</TableCell>
-								<TableCell class="font-medium">
-									{parseItemName(item).name}
-								</TableCell>
-								<TableCell>
-									<div class="flex flex-col flex-wrap gap-2">
-										{#each info.resources as requirement, index}
-											{#if index % 2 === 0}
-												<div class="flex items-center space-x-2">
-													<span class="text-sm font-medium"
-														>{parseItemName(requirement as string).name}</span
-													>
-													{#if info.resources[index + 1]}
-														<Badge variant="secondary" class="text-xs">
-															×{info.resources[index + 1]}
-														</Badge>
-													{/if}
-												</div>
-											{/if}
-										{/each}
-									</div>
-								</TableCell>
-								<TableCell>{craftPrice ? humanReadableValue(craftPrice) : '-'}</TableCell>
-								<TableCell>{itemPrice ? humanReadableValue(itemPrice) : '-'}</TableCell>
-								<TableCell>
-									<Badge
-										variant={profit && profit > 10000 ? 'default' : 'secondary'}
-										class="font-mono"
-									>
-										<TrendingUp class="mr-1 h-3 w-3" />
-										{profit ? humanReadableValue(profit) : '-'}
-									</Badge>
-								</TableCell>
-							</TableRow>
-						{/if}
+										{itemPrices[item] ? humanReadableValue(itemPrices[item]) : '-'}
+									</button>
+								{/if}
+							</TableCell>
+							<TableCell>
+								{@const profit =
+									craftPrice && itemPrices[item]
+										? itemPrices[item] - Math.round(itemPrices[item] * 0.105) - craftPrice
+										: undefined}
+								<Badge
+									variant={profit && profit > 10000 ? 'default' : 'secondary'}
+									class="font-mono"
+								>
+									<TrendingUp class="mr-1 h-3 w-3" />
+									{profit ? humanReadableValue(profit) : '-'}
+								</Badge>
+							</TableCell>
+						</TableRow>
 					{/each}
 				</TableBody>
 			</Table>

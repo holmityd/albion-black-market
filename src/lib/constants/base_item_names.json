@@ -1080,5 +1080,17 @@
   "T8_PLANKS_LEVEL1": "Uncommon Whitewood Planks",
   "T8_PLANKS_LEVEL2": "Rare Whitewood Planks",
   "T8_PLANKS_LEVEL3": "Exceptional Whitewood Planks",
-  "T8_PLANKS_LEVEL4": "Pristine Whitewood Planks"
+  "T8_PLANKS_LEVEL4": "Pristine Whitewood Planks",
+  "T4_2H_BOW_AVALON": "Adept's Mistpiercer",
+  "T5_2H_BOW_AVALON": "Expert's Mistpiercer",
+  "T6_2H_BOW_AVALON": "Master's Mistpiercer",
+  "T7_2H_BOW_AVALON": "Grandmaster's Mistpiercer",
+  "T8_2H_BOW_AVALON": "Elder's Mistpiercer",
+  "T4_2H_BOW_CRYSTAL": "Adept's Skystrider Bow",
+  "T5_2H_BOW_CRYSTAL": "Expert's Skystrider Bow",
+  "T6_2H_BOW_CRYSTAL": "Master's Skystrider Bow",
+  "T7_2H_BOW_CRYSTAL": "Grandmaster's Skystrider Bow",
+  "T8_2H_BOW_CRYSTAL": "Elder's Skystrider Bow",
+  "T4_ARTEFACT_TOKEN_FAVOR_4": "Adept's Crystallized Divinity",
+  "T4_ARTEFACT_2H_BOW_CRYSTAL": "Adept's Windborne Crystal"
 }
