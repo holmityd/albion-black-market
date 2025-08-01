@@ -192,7 +192,7 @@
 		isLoading = true;
 		selectedTier = tier;
 
-		const resources = new Set();
+		const resources: Set<string> = new Set();
 		for (const info of Object.values(selectedTierData)) {
 			for (let i = 0; i < info.resources.length; i = i + 2) {
 				const resource = info.resources[i] as string;
@@ -210,14 +210,21 @@
 			SERVER_LIST[0].value
 		);
 
-		resourcePrices = {};
+		const newResourcePrices: Record<string, number> = {};
 
 		for (const entry of resourceData) {
 			const itemKey = entry.item_id.includes('LEVEL') ? entry.item_id.split('@')[0] : entry.item_id;
 			if (entry.sell_price_min) {
-				resourcePrices[itemKey] = entry.sell_price_min;
+				newResourcePrices[itemKey] = entry.sell_price_min;
 			}
 		}
+		resources.forEach((item) => {
+			const itemKey = item.includes('LEVEL') ? item.split('@')[0] : item;
+			if (!newResourcePrices[itemKey]) {
+				newResourcePrices[itemKey] = 0;
+			}
+		});
+		resourcePrices = newResourcePrices;
 
 		// Batch items into groups of 50
 		const itemsArr = Object.keys(dataByTiers[tier]);
