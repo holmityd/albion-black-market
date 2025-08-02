@@ -4,9 +4,14 @@ import { getJson } from '../src/lib/utils/fetch';
 import all from '../src/lib/constants/crafting-data.json';
 
 const uniqueNames = new Set<string>();
-for (const item of Object.keys(all)) {
+for (const [item, recipes] of Object.entries(all)) {
 	const itemId = item.split('@')[0];
 	uniqueNames.add(itemId);
+	for (const recipe of recipes) {
+		if (typeof recipe === 'string') {
+			uniqueNames.add(recipe);
+		}
+	}
 }
 
 const filePath = './src/lib/constants/base_item_names.json';
@@ -17,8 +22,8 @@ async function getItemInfo(item: string) {
 	);
 }
 
-// const itemsArr = Array.from(uniqueNames);
-const itemsArr = ['T4_ARTEFACT_2H_BOW_CRYSTAL'];
+const itemsArr = Array.from(uniqueNames);
+// const itemsArr = ['T4_MAIN_CURSEDSTAFF_AVALON', 'T4_MAIN_CURSEDSTAFF_CRYSTAL'];
 
 async function update() {
 	for (let i = 0; i < itemsArr.length; i++) {

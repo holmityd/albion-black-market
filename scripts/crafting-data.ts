@@ -38,7 +38,11 @@ async function getItemInfo(item: string) {
 	let skipped = 0;
 
 	const itemsSet: Set<string> = new Set();
-	for (const item of CATEGORY_TREE['mainhand']['bow']) {
+	for (const item of [
+		...CATEGORY_TREE['head']['cloth_helmet'],
+		...CATEGORY_TREE['head']['leather_helmet'],
+		...CATEGORY_TREE['head']['plate_helmet']
+	]) {
 		itemsSet.add(item.split('@')[0]);
 	}
 
