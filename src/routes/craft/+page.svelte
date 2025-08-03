@@ -19,6 +19,9 @@
 	import { onMount } from 'svelte';
 	import category_tree from '$lib/constants/category_tree.json';
 	import Input from '$lib/components/ui/input/input.svelte';
+	import ItemName from '$lib/components/common/ItemName.svelte';
+	import ItemImage from '$lib/components/common/ItemImage.svelte';
+	import ItemPrice from '$lib/components/common/ItemPrice.svelte';
 
 	const categoryTree = category_tree as Record<string, Record<string, string[]>>;
 
@@ -386,7 +389,7 @@
 				<Table>
 					<TableHeader>
 						<TableRow>
-							<TableHead>Resource</TableHead>
+							<TableHead class="w-16">Item</TableHead>
 							<TableHead>Name</TableHead>
 							<TableHead>Price</TableHead>
 						</TableRow>
@@ -395,55 +398,13 @@
 						{#each Object.keys(resourcePrices) as item (item)}
 							<TableRow class="hover:bg-muted/50">
 								<TableCell class="font-medium">
-									<div
-										class="flex h-10 w-10 items-center justify-center overflow-hidden rounded bg-muted"
-									>
-										<img
-											loading="lazy"
-											src={getItemImageUrl(item)}
-											alt={item}
-											class="h-full w-full object-cover"
-										/>
-									</div>
+									<ItemImage {item} />
 								</TableCell>
 								<TableCell>
-									{@const info = parseItemName(item)}
-									{info.tier}.{info.enchant}
-									{info.name}
+									<ItemName {item} />
 								</TableCell>
-								<TableCell>
-									{#if editingItem === item}
-										<Input
-											type="number"
-											value={resourcePrices[item] || ''}
-											onchange={(e) => {
-												const value = parseFloat(e.currentTarget.value) || 0;
-												resourcePrices = { ...resourcePrices, [item]: value };
-											}}
-											onblur={() => {
-												editingItem = null;
-											}}
-											onkeydown={(e) => {
-												if (e.key === 'Enter' || e.key === 'Escape') {
-													e.currentTarget.blur();
-												}
-											}}
-											placeholder="Enter price"
-											class="w-24"
-											autofocus
-										/>
-									{:else}
-										<button
-											type="button"
-											class="cursor-pointer rounded px-2 py-1 text-left hover:bg-muted/50 focus:ring-2 focus:ring-ring focus:outline-none"
-											onclick={() => {
-												editingItem = item;
-											}}
-											tabindex="0"
-										>
-											{humanReadableValue(resourcePrices[item])}
-										</button>
-									{/if}
+								<TableCell class="relative">
+									<ItemPrice bind:price={resourcePrices[item]} isEditable />
 								</TableCell>
 							</TableRow>
 						{/each}
@@ -510,34 +471,20 @@
 				<TableBody>
 					{#each sortedItems as [item, info] (item)}
 						{@const craftPrice = craftPrices[item]}
-						{@const itemPrice = itemPrices[item]}
 
 						<TableRow class="hover:bg-muted/50">
 							<TableCell class="font-medium">
-								<div
-									class="flex h-12 w-12 items-center justify-center overflow-hidden rounded bg-muted"
-								>
-									<img
-										loading="lazy"
-										src={getItemImageUrl(item)}
-										alt={item}
-										class="h-full w-full object-cover"
-									/>
-								</div>
+								<ItemImage {item} />
 							</TableCell>
 							<TableCell class="font-medium">
-								{@const info = parseItemName(item)}
-								{info.tier}.{info.enchant}
-								{info.name}
+								<ItemName {item} showTier />
 							</TableCell>
 							<TableCell>
 								<div class="flex flex-col flex-wrap gap-2">
 									{#each info.resources as requirement, index}
 										{#if index % 2 === 0}
 											<div class="flex items-center space-x-2">
-												<span class="text-sm font-medium"
-													>{parseItemName(requirement as string).name}</span
-												>
+												<ItemName item={requirement} />
 												{#if info.resources[index + 1]}
 													<Badge variant="secondary" class="text-xs">
 														×{info.resources[index + 1]}
@@ -548,40 +495,11 @@
 									{/each}
 								</div>
 							</TableCell>
-							<TableCell>{craftPrice ? humanReadableValue(craftPrice) : '-'}</TableCell>
 							<TableCell>
-								{#if editingItem === item}
-									<Input
-										type="number"
-										value={itemPrices[item] || ''}
-										onchange={(e) => {
-											const value = parseFloat(e.currentTarget.value) || 0;
-											itemPrices = { ...itemPrices, [item]: value };
-										}}
-										onblur={() => {
-											editingItem = null;
-										}}
-										onkeydown={(e) => {
-											if (e.key === 'Enter' || e.key === 'Escape') {
-												e.currentTarget.blur();
-											}
-										}}
-										placeholder="Enter price"
-										class="w-24"
-										autofocus
-									/>
-								{:else}
-									<button
-										type="button"
-										class="cursor-pointer rounded px-2 py-1 text-left hover:bg-muted/50 focus:ring-2 focus:ring-ring focus:outline-none"
-										onclick={() => {
-											editingItem = item;
-										}}
-										tabindex="0"
-									>
-										{itemPrices[item] ? humanReadableValue(itemPrices[item]) : '-'}
-									</button>
-								{/if}
+								<ItemPrice price={craftPrice} />
+							</TableCell>
+							<TableCell class="relative">
+								<ItemPrice bind:price={itemPrices[item]} isEditable />
 							</TableCell>
 							<TableCell>
 								{@const profit =
