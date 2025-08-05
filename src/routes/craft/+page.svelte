@@ -1,4 +1,8 @@
 <script lang="ts">
+	import ItemImage from '$lib/components/common/ItemImage.svelte';
+	import ItemName from '$lib/components/common/ItemName.svelte';
+	import ItemPrice from '$lib/components/common/ItemPrice.svelte';
+	import ProfitBadge from '$lib/components/common/ProfitBadge.svelte';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Card, CardContent } from '$lib/components/ui/card';
 	import { Label } from '$lib/components/ui/label';
@@ -12,16 +16,12 @@
 		TableRow
 	} from '$lib/components/ui/table';
 	import { SERVER_LIST } from '$lib/constants';
+	import category_tree from '$lib/constants/category_tree.json';
 	import data from '$lib/constants/crafting-data.json';
 	import type { MarketDataEntry } from '$lib/types';
 	import { humanReadableValue, parseItemName } from '$lib/utils/formatters';
 	import { Loader2, TrendingUp } from 'lucide-svelte';
 	import { onMount } from 'svelte';
-	import category_tree from '$lib/constants/category_tree.json';
-	import Input from '$lib/components/ui/input/input.svelte';
-	import ItemName from '$lib/components/common/ItemName.svelte';
-	import ItemImage from '$lib/components/common/ItemImage.svelte';
-	import ItemPrice from '$lib/components/common/ItemPrice.svelte';
 
 	const categoryTree = category_tree as Record<string, Record<string, string[]>>;
 
@@ -279,15 +279,9 @@
 		tierTriggerRef?.click();
 	}
 
-	function getItemImageUrl(identifier: string): string {
-		return `https://render.albiononline.com/v1/item/${identifier}?quality=1`;
-	}
-
 	onMount(() => {
 		handleTierChange(Object.keys(dataByTiers)[0]);
 	});
-
-	let editingItem = $state<string | null>(null);
 </script>
 
 <div class="container mx-auto p-6">
@@ -470,8 +464,6 @@
 				</TableHeader>
 				<TableBody>
 					{#each sortedItems as [item, info] (item)}
-						{@const craftPrice = craftPrices[item]}
-
 						<TableRow class="hover:bg-muted/50">
 							<TableCell class="font-medium">
 								<ItemImage {item} />
@@ -496,23 +488,17 @@
 								</div>
 							</TableCell>
 							<TableCell>
-								<ItemPrice price={craftPrice} />
+								<ItemPrice price={craftPrices[item]} />
 							</TableCell>
 							<TableCell class="relative">
 								<ItemPrice bind:price={itemPrices[item]} isEditable />
 							</TableCell>
 							<TableCell>
-								{@const profit =
-									craftPrice && itemPrices[item]
-										? itemPrices[item] - Math.round(itemPrices[item] * 0.105) - craftPrice
+								<ProfitBadge
+									profit={craftPrices[item] && itemPrices[item]
+										? itemPrices[item] - Math.round(itemPrices[item] * 0.105) - craftPrices[item]
 										: undefined}
-								<Badge
-									variant={profit && profit > 10000 ? 'default' : 'secondary'}
-									class="font-mono"
-								>
-									<TrendingUp class="mr-1 h-3 w-3" />
-									{profit ? humanReadableValue(profit) : '-'}
-								</Badge>
+								/>
 							</TableCell>
 						</TableRow>
 					{/each}
