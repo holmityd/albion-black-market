@@ -1180,5 +1180,15 @@
   "T8_HEAD_PLATE_AVALON": "Elder's Helmet of Valor",
   "T4_HEAD_CLOTH_ROYAL": "Adept's Royal Cowl",
   "T4_ARTEFACT_HEAD_PLATE_FEY": "Adept's Veilweaver Mandibles",
-  "T5_ARTEFACT_HEAD_PLATE_FEY": "Expert's Veilweaver Mandibles"
+  "T5_ARTEFACT_HEAD_PLATE_FEY": "Expert's Veilweaver Mandibles",
+  "T4_RANDOM_DUNGEON_TOKEN_1": "Adept's Dungeon Map (Group)",
+  "T4_RANDOM_DUNGEON_SOLO_TOKEN_1": "Adept's Dungeon Map (Solo)",
+  "T5_RANDOM_DUNGEON_TOKEN_1": "Expert's Dungeon Map (Group)",
+  "T5_RANDOM_DUNGEON_SOLO_TOKEN_1": "Expert's Dungeon Map (Solo)",
+  "T6_RANDOM_DUNGEON_TOKEN_1": "Master's Dungeon Map (Group)",
+  "T6_RANDOM_DUNGEON_SOLO_TOKEN_1": "Master's Dungeon Map (Solo)",
+  "T7_RANDOM_DUNGEON_TOKEN_1": "Grandmaster's Dungeon Map (Group)",
+  "T7_RANDOM_DUNGEON_SOLO_TOKEN_1": "Grandmaster's Dungeon Map (Solo)",
+  "T8_RANDOM_DUNGEON_TOKEN_1": "Elder's Dungeon Map (Group)",
+  "T8_RANDOM_DUNGEON_SOLO_TOKEN_1": "Elder's Dungeon Map (Solo)"
 }

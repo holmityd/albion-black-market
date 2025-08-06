@@ -33,7 +33,7 @@ async function update() {
 		try {
 			const info = await getItemInfo(item);
 			data[item] = info.localizedNames['EN-US'];
-		} catch {}
+		} catch { }
 	}
 
 	fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
