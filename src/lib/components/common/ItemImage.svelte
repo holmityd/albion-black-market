@@ -1,7 +1,7 @@
 <script lang="ts">
-	const { item, quality = 1 }: { item: string; quality?: 1 | 2 | 3 | 4 | 5 } = $props();
+	const { item, quality }: { item: string; quality?: 1 | 2 | 3 | 4 | 5 } = $props();
 	const priceUrl = `https://albiononlinetools.com/economy/item.php?itemPrice=${item}&server=europe#price_search`;
-	const imgSrc = `https://render.albiononline.com/v1/item/${item}?quality=${quality}`;
+	const imgSrc = `https://render.albiononline.com/v1/item/${item}${quality ? `?quality=${quality}` : ''}`;
 </script>
 
 <a href={priceUrl} target="_blank" rel="noopener noreferrer">

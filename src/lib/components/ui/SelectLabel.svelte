@@ -4,9 +4,10 @@
 
 	interface Props {
 		label: string;
-		value: string;
+		value: string | string[];
 		options: string[];
-		onValueChange?: (value: string) => void;
+		multiple?: boolean;
+		onValueChange?: (value: string | string[]) => void;
 		placeholder?: string;
 		disabled?: boolean;
 		class?: string;
@@ -16,6 +17,7 @@
 		label,
 		value = $bindable(),
 		options,
+		multiple,
 		onValueChange,
 		placeholder = 'Select an option...',
 		disabled = false,
@@ -38,12 +40,15 @@
 		selectTriggerRef.dispatchEvent(new KeyboardEvent('keyup', SPACE_KEY_EVENT_CONFIG));
 	}
 
-	function handleValueChange(newValue: string): void {
+	function handleValueChange(newValue: string | string[]): void {
 		value = newValue;
 		onValueChange?.(newValue);
 	}
 
-	function displayName(name: string) {
+	function displayName(name: string | string[]) {
+		if (Array.isArray(name)) {
+			return name.join(',');
+		}
 		name = name.charAt(0).toUpperCase() + name.slice(1);
 		name = name.replace('_', ' ');
 		return name;
@@ -56,7 +61,12 @@
 	<Label for={selectTriggerRef?.id} onclick={handleLabelClick} class="cursor-pointer select-none">
 		{label}
 	</Label>
-	<Select.Root type="single" bind:value onValueChange={handleValueChange} {disabled}>
+	<Select.Root
+		type={multiple ? 'multiple' : 'single'}
+		bind:value
+		onValueChange={handleValueChange}
+		{disabled}
+	>
 		<Select.Trigger
 			bind:ref={selectTriggerRef}
 			{disabled}

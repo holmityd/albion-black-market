@@ -23,6 +23,8 @@
 	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import ChevronUp from '@lucide/svelte/icons/chevron-up';
+	import { Label } from '$lib/components/ui/label';
+	import { Checkbox } from '$lib/components/ui/checkbox';
 
 	const CRAFT_DATA = craftData as Record<string, (string | number)[]>;
 
@@ -49,11 +51,24 @@
 	const availableTiers = ['All', ...Array.from({ length: 8 }, (_, i) => `T${i + 1}`)];
 	let selectedTier = $state(availableTiers[0]);
 
+	let selectedEnchantments = $state<string[]>([]);
+	const enchantmentOptions = ['@1', '@2', '@3', '@4'];
+	const isEnchant1Enabled = $derived(selectedEnchantments.includes('@1'));
+	const isEnchant2Enabled = $derived(selectedEnchantments.includes('@2'));
+	const isEnchant3Enabled = $derived(selectedEnchantments.includes('@3'));
+	const isEnchant4Enabled = $derived(selectedEnchantments.includes('@4'));
+
 	// Items
-	const items = $derived(
-		categoryTree[selectedCategory][selectedSubCategory]?.filter(
-			(i) => selectedTier === 'All' || i.startsWith(selectedTier)
-		) || []
+	const items = $derived.by(
+		() =>
+			categoryTree[selectedCategory][selectedSubCategory]?.filter(
+				(i) =>
+					(selectedTier === 'All' || i.startsWith(selectedTier)) &&
+					(isEnchant1Enabled || !i.endsWith('@1')) &&
+					(isEnchant2Enabled || !i.endsWith('@2')) &&
+					(isEnchant3Enabled || !i.endsWith('@3')) &&
+					(isEnchant4Enabled || !i.endsWith('@4'))
+			) || []
 	);
 
 	// Prices
@@ -263,7 +278,7 @@
 <div class="container mx-auto p-6">
 	<h1 class="mb-6 text-3xl font-bold">Crafting Data</h1>
 
-	<div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-5">
+	<div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-6">
 		<SelectLabel
 			label="Server"
 			placeholder="Select server"
@@ -300,6 +315,15 @@
 			class="w-full"
 			bind:value={selectedTier}
 			options={availableTiers}
+		/>
+
+		<SelectLabel
+			multiple
+			label="Enchantment"
+			placeholder="Select Enchantment"
+			class="w-full"
+			bind:value={selectedEnchantments}
+			options={enchantmentOptions}
 		/>
 	</div>
 
